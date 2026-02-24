@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
 import { RoleEntity } from "src/entities/role.entity";
 
@@ -24,6 +24,22 @@ export class RoleRepository {
       where: { name },
     });
     return role ? new RoleEntity(role) : null;
+  }
+
+  async findManyByName(names: string[]): Promise<RoleEntity[]> {
+    const roles = await this.prismaService.role.findMany({
+      where: {
+        name: {
+          in: names,
+        },
+      },
+    });
+
+    if (roles.length !== names.length) {
+      throw new NotFoundException('One or more roles not found');
+    }
+    
+    return roles.map((role) => new RoleEntity(role));
   }
 
   async create(role: RoleEntity): Promise<RoleEntity> {

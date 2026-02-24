@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserRequestDto {
   @IsString()
@@ -8,4 +8,14 @@ export class UpdateUserRequestDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @IsString({ each: true })
+  roles: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  permissions: string[];
 }

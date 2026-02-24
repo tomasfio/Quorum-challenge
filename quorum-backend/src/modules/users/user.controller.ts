@@ -4,6 +4,7 @@ import { UserResponseDto } from './dtos/user-response.dto';
 import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 import { UpdateUserRequestDto } from './dtos/update-user-request.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { HasPermissions, HasRoles } from 'src/common/decorators/auth.decorator';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
@@ -23,6 +24,7 @@ export class UserController {
 
   @Post()
   @HttpCode(201)
+  @HasRoles('admin')
   async createUser(
     @Body() createUserRequestDto: CreateUserRequestDto,
   ): Promise<UserResponseDto> {
@@ -31,6 +33,7 @@ export class UserController {
 
   @Patch(':id')
   @HttpCode(200)
+  @HasRoles('admin')
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserRequestDto: UpdateUserRequestDto,
@@ -40,8 +43,8 @@ export class UserController {
 
   @Delete(':id')
   @HttpCode(204)
+  @HasRoles('admin')
   async deleteUser(@Param('id') id: string): Promise<void> {
     return await this.userService.deleteUser(id);
   }
-
 }

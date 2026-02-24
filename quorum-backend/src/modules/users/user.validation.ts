@@ -15,6 +15,7 @@ export class UsersValidation {
   async validateCreate(dto: CreateUserRequestDto): Promise<void> {
     await this.ensureEmailNotTaken(dto.email);
     this.ensureStrongPassword(dto.password);
+    this.ensureRoleIsNotAdmin(dto.roles);
   }
 
   async validateUpdate(
@@ -24,6 +25,7 @@ export class UsersValidation {
     if (dto.email) {
       await this.ensureEmailNotTaken(dto.email, userId);
     }
+    this.ensureRoleIsNotAdmin(dto.roles);
   }
 
   async validateDelete(id: string): Promise<void> {
@@ -56,6 +58,12 @@ export class UsersValidation {
       throw new BadRequestException(
         'The password must be at least 8 characters, uppercase, lowercase and numbers',
       );
+    }
+  }
+  
+  private ensureRoleIsNotAdmin(roles: string[]): void {
+    if (roles.includes('ADMIN')) {
+      throw new BadRequestException('The role admin is not allowed to be assigned to a user');
     }
   }
 }

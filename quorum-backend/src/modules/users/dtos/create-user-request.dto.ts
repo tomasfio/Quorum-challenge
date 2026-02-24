@@ -4,6 +4,8 @@ import {
   IsEmail,
   MinLength,
   MaxLength,
+  IsArray,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateUserRequestDto {
@@ -20,4 +22,14 @@ export class CreateUserRequestDto {
   @MinLength(8)
   @MaxLength(32)
   password: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @IsString({ each: true })
+  roles: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  permissions: string[];
 }

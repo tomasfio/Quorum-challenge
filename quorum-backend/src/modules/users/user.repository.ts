@@ -3,6 +3,8 @@ import { PrismaService } from 'src/database/prisma.service';
 import { UserEntity } from 'src/entities/user.entity';
 import { UserResponseDto } from './dtos/user-response.dto';
 import { UpdateUserRequestDto } from './dtos/update-user-request.dto';
+import { RoleEntity } from 'src/entities/role.entity';
+import { PermissionEntity } from 'src/entities/permission.entity';
 
 @Injectable()
 export class UserRepository {
@@ -23,48 +25,110 @@ export class UserRepository {
   async getUserById(id: string): Promise<UserEntity> {
     const user = await this.prismaService.user.findUnique({
       where: { id },
-    });
+      include: {
+        roles: {
+          include: {
+            role: {
+              include: {
+                permissions: { include: { permission: true } },
+              },
+            },
+          },
+        },
+        permissions: { include: { permission: true } },
+      },
+    }) 
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
+    const roles = user.roles.map((role) => ({ id: role.roleId, name: role.role.name }));
+    const permissions = [
+      ...user.permissions.map((permission) => ({ id: permission.permissionId, name: permission.permission.name })),
+      ...user.roles.flatMap((role) => role.role.permissions.map((permission) => ({ id: permission.permissionId, name: permission.permission.name }))),
+    ];
+
     return new UserEntity({
       id: user.id,
       name: user.name,
       email: user.email,
+      roles: roles.map((role) => new RoleEntity(role)),
+      permissions: user.permissions.map((permission) => new PermissionEntity(permission.permission)),
     });
   }
 
-  async createUser(user: UserEntity): Promise<UserEntity> {
+  async createUser(user: UserEntity): Promise<string> {
+    const rolesNames = user.roles.map((role) => role.name);
+    const permissionsNames = user.permissions.map((permission) => permission.name);
+
+    const roles = await this.prismaService.role.findMany({
+      where: {
+        name: {
+          in: rolesNames,
+        },
+      },
+    });
+
+    const permissions = await this.prismaService.permission.findMany({
+      where: {
+        name: {
+          in: permissionsNames,
+        },
+      },
+    });
+
     const createdUser = await this.prismaService.user.create({
       data: {
         name: user.name,
         email: user.email,
         password: user.password,
+        roles: {
+          create: user.roles.map((role) => ({
+            role: {
+              connect: { id: role.id },
+            },
+          })),
+        },
+        permissions: {
+          create: user.permissions.map((permission) => ({
+            permission: {
+              connect: { id: permission.id },
+            },
+          })),
+        },
       },
     });
 
-    return new UserEntity({
-      id: createdUser.id,
-      name: createdUser.name,
-      email: createdUser.email,
-    });
+    return createdUser.id;
   }
 
   async updateUser(
     id: string,
-    updateUserRequestDto: UpdateUserRequestDto,
-  ): Promise<UserEntity> {
-    const updatedUser = await this.prismaService.user.update({
+    user: UserEntity,
+  ): Promise<void> {
+    await this.prismaService.user.update({
       where: { id },
-      data: updateUserRequestDto,
-    });
-
-    return new UserEntity({
-      id: updatedUser.id,
-      name: updatedUser.name,
-      email: updatedUser.email,
+      data: {
+        name: user.name,
+        email: user.email,
+        roles: {
+          deleteMany: {},
+          create: user.roles.map((role) => ({
+            role: {
+              connect: { id: role.id },
+            },
+          })),
+        },
+        permissions: {
+          deleteMany: {},
+          create: user.permissions.map((permission) => ({
+            permission: {
+              connect: { id: permission.id },
+            },
+          })),
+        },
+      },
     });
   }
 
