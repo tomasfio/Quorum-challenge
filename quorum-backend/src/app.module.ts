@@ -6,6 +6,8 @@ import databaseConfig from './config/database.config';
 import { PrismaService } from './database/prisma.service';
 import { UserModule } from './modules/users/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { RoleModule } from './modules/roles/role.module';
+import { PermissionModule } from './modules/permissions/permission.module';
 
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -18,6 +20,8 @@ const projectRoot = path.resolve(__dirname, '..');
     }),
     UserModule,
     AuthModule,
+    RoleModule,
+    PermissionModule,
   ],
   providers: [PrismaService],
   exports: [PrismaService],
