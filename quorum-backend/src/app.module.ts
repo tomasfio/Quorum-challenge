@@ -5,6 +5,7 @@ import { envConfig } from './config/env.config';
 import databaseConfig from './config/database.config';
 import { PrismaService } from './database/prisma.service';
 import { UserModule } from './modules/users/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -16,6 +17,7 @@ const projectRoot = path.resolve(__dirname, '..');
       load: [envConfig, databaseConfig],
     }),
     UserModule,
+    AuthModule,
   ],
   providers: [PrismaService],
   exports: [PrismaService],

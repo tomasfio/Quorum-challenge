@@ -38,7 +38,11 @@ export class UserRepository {
 
   async createUser(user: UserEntity): Promise<UserEntity> {
     const createdUser = await this.prismaService.user.create({
-      data: user,
+      data: {
+        name: user.name,
+        email: user.email,
+        password: user.password,
+      },
     });
 
     return new UserEntity({

@@ -18,6 +18,60 @@ model User {
   name      String
   email     String   @unique
   password  String
+  
+  roles       UserRole[]
+  permissions UserPermission[]
 
   @@map("users")
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  users   UserPermission[]
+  roles   RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int  @map("role_id")
+  permissionId Int  @map("permission_id")
+
+  role        Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@map("roles_permissions")
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId    String  @map("user_id")
+  roleId    Int     @map("role_id")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@map("users_roles")
+  @@id([userId, roleId])
+}
+
+model UserPermission {
+  userId    String  @map("user_id")
+  permissionId Int  @map("permission_id")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission  Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  @@map("users_permissions")
+  @@id([userId, permissionId])
 }
