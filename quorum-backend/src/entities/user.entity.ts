@@ -1,4 +1,4 @@
-import type { User } from '.prisma/client';
+import { User } from '@prisma/client';
 import { RoleEntity } from './role.entity';
 import { PermissionEntity } from './permission.entity';
 

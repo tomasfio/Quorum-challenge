@@ -2,10 +2,13 @@ version: '3.9'
 
 services:
   api:
-    build: .
-    container_name: nest-api
-    env_file:
-      - .env
+    build: ./quorum-backend
+    container_name: quorum-api
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://quorum:secret@db:5432/quorum-db
+      - JWT_SECRET=secret-key
     ports:
       - "3000:3000"
     depends_on:
@@ -13,15 +16,22 @@ services:
 
   db:
     image: postgres:16
-    container_name: postgres-db
+    container_name: quorum-db
     environment:
-      POSTGRES_DB: appdb
-      POSTGRES_USER: app
+      POSTGRES_DB: quorum-db
+      POSTGRES_USER: quorum
       POSTGRES_PASSWORD: secret
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quorum -d quorum-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
+  node_modules:
+    driver: local

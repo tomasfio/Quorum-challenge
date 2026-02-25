@@ -1,13 +1,41 @@
-FROM node:20-alpine
+# Etapa 1: Construcción (Debian para Prisma/OpenSSL compatible)
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
+# Copiar archivos de dependencias
 COPY package*.json ./
+COPY prisma ./prisma/
+
+# Instalar dependencias incluyendo devDependencies
 RUN npm install
 
+# Copiar el resto del código fuente
 COPY . .
+
+# DATABASE_URL dummy solo para prisma generate (no conecta a la DB)
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+
+# Generar Prisma Client
+RUN npx prisma generate
+
+# Compilar la aplicación NestJS
 RUN npm run build
+
+# Etapa 2: Producción (Debian para libssl.so.1.1 que usa Prisma)
+FROM node:20-bookworm-slim AS runner
+
+WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Copiar solo los archivos necesarios de la etapa builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package*.json ./
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:prod"]
+# Migrar si hay DATABASE_URL y arrancar la app (sin script externo para evitar CRLF)
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]
