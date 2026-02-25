@@ -3,6 +3,7 @@ import {
   ConflictException,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { CreateUserRequestDto } from './dtos/create-user-request.dto';
@@ -22,13 +23,15 @@ export class UsersValidation {
     userId: string,
     dto: UpdateUserRequestDto,
   ): Promise<void> {
+    await this.ensureUserIsNotAdmin(userId);
+    this.ensureRoleIsNotAdmin(dto.roles);
     if (dto.email) {
       await this.ensureEmailNotTaken(dto.email, userId);
     }
-    this.ensureRoleIsNotAdmin(dto.roles);
   }
 
   async validateDelete(id: string): Promise<void> {
+    await this.ensureUserIsNotAdmin(id);
     await this.ensureUserExists(id);
   }
 
@@ -60,6 +63,13 @@ export class UsersValidation {
       );
     }
   }
+
+  private async ensureUserIsNotAdmin(userId: string): Promise<void> {
+    const user = await this.userRepository.getUserById(userId);
+    if (user.roles.some((role) => role.name === 'ADMIN')) {
+      throw new ForbiddenException('The user is an admin and cannot be modified');
+    }
+  } 
   
   private ensureRoleIsNotAdmin(roles: string[]): void {
     if (roles.includes('ADMIN')) {

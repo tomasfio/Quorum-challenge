@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
+import { PermissionEntity } from "src/entities/permission.entity";
 import { RoleEntity } from "src/entities/role.entity";
 
 @Injectable()
@@ -14,9 +15,16 @@ export class RoleRepository {
   async findById(id: number): Promise<RoleEntity | null> {
     const role = await this.prismaService.role.findUnique({
       where: { id },
+      include: {
+        permissions: { include: { permission: true } },
+      },
     });
 
-    return role ? new RoleEntity(role) : null;
+    return role ? new RoleEntity({
+      id: role.id,
+      name: role.name,
+      permissions: role.permissions.map((permission) => new PermissionEntity(permission.permission)),
+    }) : null;
   }
 
   async findByName(name: string): Promise<RoleEntity | null> {
@@ -42,23 +50,26 @@ export class RoleRepository {
     return roles.map((role) => new RoleEntity(role));
   }
 
-  async create(role: RoleEntity): Promise<RoleEntity> {
+  async create(role: RoleEntity): Promise<number> {
     const createdRole = await this.prismaService.role.create({
       data: {
         name: role.name,
       },
     });
-    return new RoleEntity(createdRole);
+    return createdRole.id;
   }
   
-  async update(id: number, role: RoleEntity): Promise<RoleEntity> {
-    const updatedRole = await this.prismaService.role.update({
+  async update(id: number, role: RoleEntity): Promise<void> {
+    await this.prismaService.role.update({
       where: { id },
       data: {
         name: role.name,
+        permissions: {
+          deleteMany: {},
+          create: role.permissions.map((permission) => ({ permissionId: permission.id })),
+        },
       },
     });
-    return new RoleEntity(updatedRole);
   }
   
   async delete(id: number): Promise<void> {

@@ -6,6 +6,7 @@ import { UpdateRoleRequestDto } from "./dtos/update-role-request.dto";
 import { HasRoles } from "src/common/decorators/auth.decorator";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesGuard } from "src/common/guards/role.guards";
+import { ROLE_ADMIN } from "src/shared/constants/role.constants";
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('roles')
@@ -26,21 +27,21 @@ export class RoleController {
 
   @Post()
   @HttpCode(201)
-  @HasRoles('admin')
+  @HasRoles(ROLE_ADMIN)
   async createRole(@Body() createRoleRequestDto: CreateRoleRequestDto): Promise<RoleEntity> {
     return this.roleService.createRole(createRoleRequestDto);
   }
 
   @Patch(':id')
   @HttpCode(200)
-  @HasRoles('admin')
+  @HasRoles(ROLE_ADMIN)
   async updateRole(@Param('id') id: number, @Body() updateRoleRequestDto: UpdateRoleRequestDto): Promise<RoleEntity> {
     return this.roleService.updateRole(id, updateRoleRequestDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  @HasRoles('admin')
+  @HasRoles(ROLE_ADMIN)
   async deleteRole(@Param('id') id: number): Promise<void> {
     return this.roleService.deleteRole(id);
   }
