@@ -19,18 +19,18 @@ export class UserService {
   ) {}
 
   async getUsers(): Promise<UserResponseDto[]> {
-    return await this.userRepository.getUsers();
+    const users = await this.userRepository.getUsers();
+    
+    return users.map((user) => new UserResponseDto({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    }));
   }
 
   async getUserById(id: string): Promise<UserResponseDto> {
     const user = await this.userRepository.getUserById(id);
-    return new UserResponseDto({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      roles: user.roles.map((role) => role.name),
-      permissions: user.permissions.map((permission) => permission.name),
-    });
+    return UserResponseDto.toUserResponseDto(user);
   }
 
   async createUser(

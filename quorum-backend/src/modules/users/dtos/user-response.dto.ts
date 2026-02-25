@@ -11,10 +11,10 @@ export class UserResponseDto {
   @ApiProperty({ example: "user@example.com", description: "User email" })
   email: string;
 
-  @ApiProperty({ example: ["EDITOR"], description: "Role names", type: [String], isArray: true })
+  @ApiProperty({ example: ["CLIENT"], description: "Role names", type: [String], isArray: true })
   roles: string[];
 
-  @ApiProperty({ example: ["read", "write"], description: "Permission names", type: [String], isArray: true })
+  @ApiProperty({ example: ["READ_CLIENTS", "WRITE_CLIENTS"], description: "Permission names", type: [String], isArray: true })
   permissions: string[];
 
   constructor(user: Partial<UserResponseDto>) {

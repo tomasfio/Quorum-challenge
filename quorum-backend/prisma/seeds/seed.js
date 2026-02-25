@@ -1,5 +1,5 @@
-// prisma/seed.ts
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
@@ -16,13 +16,15 @@ async function main() {
     create: { name: 'CLIENT' },
   });
 
+  const hashedPassword = await bcrypt.hash('secret', 10);
+
   const admin = await prisma.user.upsert({
     where: { email: 'admin@example.com' },
     update: {},
     create: {
       email: 'admin@example.com',
       name: 'Admin',
-      password: 'HASH',
+      password: hashedPassword,
     },
   });
 
@@ -30,23 +32,25 @@ async function main() {
     where: { name: 'ADMIN' },
   });
 
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: admin.id,
-        roleId: adminRole!.id,
+  if (adminRole) {
+    await prisma.userRole.upsert({
+      where: {
+        userId_roleId: {
+          userId: admin.id,
+          roleId: adminRole.id,
+        },
       },
-    },
-    update: {},
-    create: {
-      userId: admin.id,
-      roleId: adminRole!.id,
-    },
-  });
+      update: {},
+      create: {
+        userId: admin.id,
+        roleId: adminRole.id,
+      },
+    });
+  }
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })

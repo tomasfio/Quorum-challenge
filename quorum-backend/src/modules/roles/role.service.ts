@@ -6,31 +6,40 @@ import { UpdateRoleRequestDto } from "./dtos/update-role-request.dto";
 import { RoleValidation } from "./role.validation";
 import { PermissionEntity } from "src/entities/permission.entity";
 import { PermissionRepository } from "../permissions/permission.repository";
+import { RoleResponseDto } from "./dtos/role-response.dto";
 
 @Injectable()
 export class RoleService {
   constructor(private readonly roleRepository: RoleRepository, private readonly roleValidation: RoleValidation, private readonly permissionRepository: PermissionRepository) {}
 
-  async getRoles(): Promise<RoleEntity[]> {
-    return this.roleRepository.getRoles();
+  async getRoles(): Promise<RoleResponseDto[]> {
+    const roles = await this.roleRepository.getRoles();
+    return roles.map((role) => new RoleResponseDto({
+      id: role.id.toString(),
+      name: role.name,
+    }));
   }
 
-  async getRoleById(id: number): Promise<RoleEntity> {
+  async getRoleById(id: number): Promise<RoleResponseDto> {
     const role = await this.roleRepository.findById(id);
     if (!role) {
       throw new NotFoundException('Role not found');
     }
-    return role;
+    return new RoleResponseDto({
+      id: role.id.toString(),
+      name: role.name,
+      permissions: role.permissions.map((permission) => permission.name),
+    });
   }
 
-  async createRole(createRoleRequestDto: CreateRoleRequestDto): Promise<RoleEntity> {
+  async createRole(createRoleRequestDto: CreateRoleRequestDto): Promise<RoleResponseDto> {
     await this.roleValidation.validateCreate(createRoleRequestDto);
     const createRole = await this.toRoleEntity(createRoleRequestDto);
     const roleId = await this.roleRepository.create(createRole);
     return await this.getRoleById(roleId);
   }
 
-  async updateRole(id: number, updateRoleRequestDto: UpdateRoleRequestDto): Promise<RoleEntity> {
+  async updateRole(id: number, updateRoleRequestDto: UpdateRoleRequestDto): Promise<RoleResponseDto> {
     await this.roleValidation.validateUpdate(id, updateRoleRequestDto);
     const updateRole = await this.toUpdateRoleEntity(updateRoleRequestDto);
     await this.roleRepository.update(id, updateRole);

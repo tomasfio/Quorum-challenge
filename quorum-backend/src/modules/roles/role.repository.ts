@@ -54,6 +54,9 @@ export class RoleRepository {
     const createdRole = await this.prismaService.role.create({
       data: {
         name: role.name,
+        permissions: {
+          create: role.permissions.map((permission) => ({ permissionId: permission.id })),
+        },
       },
     });
     return createdRole.id;

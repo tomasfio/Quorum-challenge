@@ -27,13 +27,13 @@ export class CreateUserRequestDto {
   @MaxLength(32)
   password: string;
 
-  @ApiProperty({ example: ["EDITOR"], description: "Role names", type: [String], isArray: true })
+  @ApiProperty({ example: ["CLIENT"], description: "Role names", type: [String], isArray: true })
   @IsArray()
   @IsNotEmpty()
   @IsString({ each: true })
   roles: string[];
 
-  @ApiPropertyOptional({ example: ["read", "write"], description: "Permission names", type: [String], isArray: true })
+  @ApiPropertyOptional({ example: ["READ_CLIENTS", "WRITE_CLIENTS"], description: "Permission names", type: [String], isArray: true })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

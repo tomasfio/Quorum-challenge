@@ -4,7 +4,7 @@ export class PermissionResponseDto {
   @ApiProperty({ example: 1, description: "Permission id" })
   id: number;
 
-  @ApiProperty({ example: "read", description: "Permission name" })
+  @ApiProperty({ example: "READ_CLIENTS", description: "Permission name" })
   name: string;
 
   constructor(permission: Partial<PermissionResponseDto>) {

@@ -7,6 +7,9 @@ export class RoleResponseDto {
   @ApiProperty({ example: "EDITOR", description: "Role name" })
   name: string;
 
+  @ApiProperty({ example: ["READ_CLIENTS", "WRITE_CLIENTS"], description: "Permission names", type: [String], isArray: true })
+  permissions: string[];
+
   constructor(role: Partial<RoleResponseDto>) {
     Object.assign(this, role);
   }

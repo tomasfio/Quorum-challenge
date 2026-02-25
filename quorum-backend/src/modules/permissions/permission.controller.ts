@@ -53,7 +53,7 @@ export class PermissionController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async createPermission(
     @Body() createPermissionRequestDto: CreatePermissionRequestDto,
-  ): Promise<PermissionEntity> {
+  ): Promise<PermissionResponseDto> {
     return this.permissionService.createPermission(createPermissionRequestDto);
   }
 
@@ -68,7 +68,7 @@ export class PermissionController {
   async updatePermission(
     @Param('id') id: number,
     @Body() updatePermissionRequestDto: UpdatePermissionRequestDto,
-  ): Promise<PermissionEntity> {
+  ): Promise<PermissionResponseDto> {
     return this.permissionService.updatePermission(id, updatePermissionRequestDto);
   }
 

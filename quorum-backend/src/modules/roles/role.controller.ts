@@ -20,7 +20,7 @@ export class RoleController {
   @Get()
   @ApiOperation({ summary: 'Get all roles', description: 'Get all roles' })
   @ApiResponse({ status: 200, description: 'Roles fetched successfully', type: [RoleResponseDto] }) 
-  async getRoles(): Promise<RoleEntity[]> {
+  async getRoles(): Promise<RoleResponseDto[]> {
     return this.roleService.getRoles();
   }
 
@@ -28,7 +28,7 @@ export class RoleController {
   @ApiOperation({ summary: 'Get a role by id', description: 'Get a role by id' })
   @ApiResponse({ status: 200, description: 'Role fetched successfully', type: RoleResponseDto })
   @ApiResponse({ status: 404, description: 'Role not found' })
-  async getRoleById(@Param('id') id: number): Promise<RoleEntity> {
+  async getRoleById(@Param('id') id: number): Promise<RoleResponseDto> {
     return this.roleService.getRoleById(id);
   }
 
@@ -39,7 +39,7 @@ export class RoleController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @HasRoles(ROLE_ADMIN)
-  async createRole(@Body() createRoleRequestDto: CreateRoleRequestDto): Promise<RoleEntity> {
+  async createRole(@Body() createRoleRequestDto: CreateRoleRequestDto): Promise<RoleResponseDto> {
     return this.roleService.createRole(createRoleRequestDto);
   }
 
@@ -50,7 +50,7 @@ export class RoleController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @HasRoles(ROLE_ADMIN)
-  async updateRole(@Param('id') id: number, @Body() updateRoleRequestDto: UpdateRoleRequestDto): Promise<RoleEntity> {
+  async updateRole(@Param('id') id: number, @Body() updateRoleRequestDto: UpdateRoleRequestDto): Promise<RoleResponseDto> {
     return this.roleService.updateRole(id, updateRoleRequestDto);
   }
 

@@ -17,9 +17,16 @@ export class UserRepository {
     return user ? new UserEntity(user) : null;
   }
 
-  async getUsers(): Promise<UserResponseDto[]> {
+  async getUsers(): Promise<UserEntity[]> {
     const users = await this.prismaService.user.findMany();
-    return users.map((user) => new UserResponseDto(user));
+    return users.map((user) => {
+
+      return new UserEntity({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    });
   }
 
   async getUserById(id: string): Promise<UserEntity> {
@@ -54,30 +61,11 @@ export class UserRepository {
       name: user.name,
       email: user.email,
       roles: roles.map((role) => new RoleEntity(role)),
-      permissions: user.permissions.map((permission) => new PermissionEntity(permission.permission)),
+      permissions: permissions.map((permission) => new PermissionEntity(permission)),
     });
   }
 
   async createUser(user: UserEntity): Promise<string> {
-    const rolesNames = user.roles.map((role) => role.name);
-    const permissionsNames = user.permissions.map((permission) => permission.name);
-
-    const roles = await this.prismaService.role.findMany({
-      where: {
-        name: {
-          in: rolesNames,
-        },
-      },
-    });
-
-    const permissions = await this.prismaService.permission.findMany({
-      where: {
-        name: {
-          in: permissionsNames,
-        },
-      },
-    });
-
     const createdUser = await this.prismaService.user.create({
       data: {
         name: user.name,

@@ -4,6 +4,7 @@ import { PermissionRepository } from "./permission.repository";
 import { CreatePermissionRequestDto } from "./dtos/create-permission-request.dto";
 import { UpdatePermissionRequestDto } from "./dtos/update-permission-request.dto";
 import { PermissionValidation } from "./permission.validation";
+import { PermissionResponseDto } from "./dtos/permission-response.dto";
 
 @Injectable()
 export class PermissionService {
@@ -12,35 +13,45 @@ export class PermissionService {
     private readonly permissionValidation: PermissionValidation,
   ) {}
 
-  async getPermissions(): Promise<PermissionEntity[]> {
-    return this.permissionRepository.getPermissions();
+  async getPermissions(): Promise<PermissionResponseDto[]> {
+    const permissions = await this.permissionRepository.getPermissions();
+    return permissions.map((permission) => new PermissionResponseDto({
+      id: permission.id,
+      name: permission.name,
+    }));
   }
 
-  async getPermissionById(id: number): Promise<PermissionEntity> {
+  async getPermissionById(id: number): Promise<PermissionResponseDto> {
     const permission = await this.permissionRepository.findById(id);
     if (!permission) {
       throw new NotFoundException('Permission not found');
     }
-    return permission;
+
+    return new PermissionResponseDto({
+      id: permission.id,
+      name: permission.name,
+    });
   }
 
-  async createPermission(createPermissionRequestDto: CreatePermissionRequestDto): Promise<PermissionEntity> {
+  async createPermission(createPermissionRequestDto: CreatePermissionRequestDto): Promise<PermissionResponseDto> {
     await this.permissionValidation.validateCreate(createPermissionRequestDto);
     const permissionId = await this.permissionRepository.create(
       new PermissionEntity(createPermissionRequestDto),
     );
+
     return await this.getPermissionById(permissionId);
   }
 
   async updatePermission(
     id: number,
     updatePermissionRequestDto: UpdatePermissionRequestDto,
-  ): Promise<PermissionEntity> {
+  ): Promise<PermissionResponseDto> {
     await this.permissionValidation.validateUpdate(id, updatePermissionRequestDto);
     await this.permissionRepository.update(
       id,
       new PermissionEntity(updatePermissionRequestDto),
     );
+
     return await this.getPermissionById(id);
   }
 
