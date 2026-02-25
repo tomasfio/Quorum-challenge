@@ -9,5 +9,6 @@ import { PermissionValidation } from "./permission.validation";
   imports: [],
   controllers: [PermissionController],
   providers: [PermissionService, PermissionRepository, PrismaService, PermissionValidation],
+  exports: [PermissionRepository],
 })
 export class PermissionModule {}

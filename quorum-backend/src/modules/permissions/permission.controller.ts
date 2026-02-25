@@ -16,6 +16,7 @@ import { UpdatePermissionRequestDto } from "./dtos/update-permission-request.dto
 import { HasRoles } from "src/common/decorators/auth.decorator";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesGuard } from "src/common/guards/role.guards";
+import { ROLE_ADMIN } from "src/shared/constants/role.constants";
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('permissions')
@@ -36,7 +37,7 @@ export class PermissionController {
 
   @Post()
   @HttpCode(201)
-  @HasRoles('admin')
+  @HasRoles(ROLE_ADMIN)
   async createPermission(
     @Body() createPermissionRequestDto: CreatePermissionRequestDto,
   ): Promise<PermissionEntity> {
@@ -45,7 +46,7 @@ export class PermissionController {
 
   @Patch(':id')
   @HttpCode(200)
-  @HasRoles('admin')
+  @HasRoles(ROLE_ADMIN)
   async updatePermission(
     @Param('id') id: number,
     @Body() updatePermissionRequestDto: UpdatePermissionRequestDto,
@@ -55,7 +56,7 @@ export class PermissionController {
 
   @Delete(':id')
   @HttpCode(204)
-  @HasRoles('admin')
+  @HasRoles(ROLE_ADMIN)
   async deletePermission(@Param('id') id: number): Promise<void> {
     return this.permissionService.deletePermission(id);
   }

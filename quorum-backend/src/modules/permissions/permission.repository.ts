@@ -46,23 +46,22 @@ export class PermissionRepository {
     return permissions.map((permission) => new PermissionEntity(permission));
   }
 
-  async create(permission: PermissionEntity): Promise<PermissionEntity> {
+  async create(permission: PermissionEntity): Promise<number> {
     const createdPermission = await this.prismaService.permission.create({
       data: {
         name: permission.name,
       },
     });
-    return new PermissionEntity(createdPermission);
+    return createdPermission.id;
   }
 
-  async update(id: number, permission: PermissionEntity): Promise<PermissionEntity> {
-    const updatedPermission = await this.prismaService.permission.update({
+  async update(id: number, permission: PermissionEntity): Promise<void> {
+    await this.prismaService.permission.update({
       where: { id },
       data: {
         name: permission.name,
       },
     });
-    return new PermissionEntity(updatedPermission);
   }
 
   async delete(id: number): Promise<void> {

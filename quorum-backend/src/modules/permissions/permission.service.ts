@@ -26,10 +26,10 @@ export class PermissionService {
 
   async createPermission(createPermissionRequestDto: CreatePermissionRequestDto): Promise<PermissionEntity> {
     await this.permissionValidation.validateCreate(createPermissionRequestDto);
-    const permission = await this.permissionRepository.create(
+    const permissionId = await this.permissionRepository.create(
       new PermissionEntity(createPermissionRequestDto),
     );
-    return new PermissionEntity(permission);
+    return await this.getPermissionById(permissionId);
   }
 
   async updatePermission(
@@ -37,11 +37,11 @@ export class PermissionService {
     updatePermissionRequestDto: UpdatePermissionRequestDto,
   ): Promise<PermissionEntity> {
     await this.permissionValidation.validateUpdate(id, updatePermissionRequestDto);
-    const permission = await this.permissionRepository.update(
+    await this.permissionRepository.update(
       id,
       new PermissionEntity(updatePermissionRequestDto),
     );
-    return new PermissionEntity(permission);
+    return await this.getPermissionById(id);
   }
 
   async deletePermission(id: number): Promise<void> {

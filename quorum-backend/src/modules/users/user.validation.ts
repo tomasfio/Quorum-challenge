@@ -8,6 +8,7 @@ import {
 import { UserRepository } from './user.repository';
 import { CreateUserRequestDto } from './dtos/create-user-request.dto';
 import { UpdateUserRequestDto } from './dtos/update-user-request.dto';
+import { ROLE_ADMIN } from 'src/shared/constants/role.constants';
 
 @Injectable()
 export class UsersValidation {
@@ -31,8 +32,8 @@ export class UsersValidation {
   }
 
   async validateDelete(id: string): Promise<void> {
-    await this.ensureUserIsNotAdmin(id);
     await this.ensureUserExists(id);
+    await this.ensureUserIsNotAdmin(id);
   }
 
   private async ensureUserExists(id: string): Promise<void> {
@@ -66,13 +67,13 @@ export class UsersValidation {
 
   private async ensureUserIsNotAdmin(userId: string): Promise<void> {
     const user = await this.userRepository.getUserById(userId);
-    if (user.roles.some((role) => role.name === 'ADMIN')) {
+    if (user.roles.some((role) => role.name === ROLE_ADMIN)) {
       throw new ForbiddenException('The user is an admin and cannot be modified');
     }
   } 
   
   private ensureRoleIsNotAdmin(roles: string[]): void {
-    if (roles.includes('ADMIN')) {
+    if (roles.includes(ROLE_ADMIN)) {
       throw new BadRequestException('The role admin is not allowed to be assigned to a user');
     }
   }

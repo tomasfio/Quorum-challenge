@@ -4,12 +4,12 @@ import { UserService } from './user.service';
 import { PrismaService } from 'src/database/prisma.service';
 import { UserRepository } from './user.repository';
 import { UsersValidation } from './user.validation';
-import { PermissionRepository } from '../permissions/permission.repository';
-import { RoleRepository } from '../roles/role.repository';
+import { PermissionModule } from '../permissions/permission.module';
+import { RoleModule } from '../roles/role.module';
 
 @Module({
-  imports: [],
+  imports: [RoleModule, PermissionModule],
   controllers: [UserController],
-  providers: [UserService, UserRepository, PrismaService, UsersValidation, RoleRepository, PermissionRepository],
+  providers: [UserService, UserRepository, PrismaService, UsersValidation],
 })
 export class UserModule {}
