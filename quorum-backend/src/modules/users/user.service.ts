@@ -82,7 +82,7 @@ export class UserService {
     updateUserRequestDto: UpdateUserRequestDto,
   ): Promise<UserEntity> {
     const roles = await this.roleRepository.findManyByName(updateUserRequestDto.roles);
-    const permissions = await this.permissionRepository.findManyByName(updateUserRequestDto.permissions);
+    const permissions = await this.permissionRepository.findManyByName(updateUserRequestDto.permissions ?? []);
 
     return new UserEntity({
       id: id,
