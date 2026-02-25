@@ -1,0 +1,72 @@
+# Quorum Challenge
+
+## Resumen del proyecto
+
+**Quorum** es una API REST desarrollada con **NestJS** que gestiona usuarios, roles y permisos. Incluye:
+
+- **Autenticación**: login con JWT (email + contraseña).
+- **Usuarios**: CRUD de usuarios con asignación de roles y permisos.
+- **Roles**: CRUD de roles y sus permisos.
+- **Permisos**: CRUD de permisos que se asignan a los roles.
+
+La base de datos es **PostgreSQL** y el acceso a datos se hace con **Prisma**. Al arrancar con Docker se ejecutan las migraciones y un seed que crea roles y un usuario administrador listo para pruebas.
+
+---
+
+## Levantar el proyecto con Docker
+
+Desde la raíz del repositorio:
+
+```bash
+docker compose up -d --build
+```
+
+O, si estás dentro de `quorum-backend`:
+
+```bash
+npm run docker:up
+```
+
+Esto levanta:
+
+- **API**: en `http://localhost:3000`
+- **PostgreSQL**: en el puerto `5432`
+
+Para bajar los contenedores y eliminar volúmenes:
+
+```bash
+docker compose down -v
+```
+
+(o `npm run docker:down` desde `quorum-backend`).
+
+---
+
+## Conectarse a la base de datos con pgAdmin
+
+1. Abre **pgAdmin** (instalado en tu máquina).
+2. Crea una nueva conexión (**Register → Server**).
+3. En la pestaña **Connection** usa:
+
+   | Campo        | Valor      |
+   |-------------|------------|
+   | Host        | `localhost` |
+   | Port        | `5432`     |
+   | Maintenance database | `quorum-db` |
+   | Username    | `quorum`   |
+   | Password    | `secret`   |
+
+4. Guarda y conecta. Verás la base `quorum-db` con las tablas creadas por Prisma.
+
+---
+
+## Usuario administrador para pruebas
+
+El seed que se ejecuta al levantar con Docker ya crea un usuario administrador. Puedes usarlo para hacer login y probar la API:
+
+| Campo      | Valor              |
+|-----------|--------------------|
+| **Email** | `admin@example.com` |
+| **Password** | `secret`        |
+
+Con este usuario obtendrás un JWT que te permite acceder a los endpoints protegidos que requieren rol `ADMIN` (gestión de usuarios, roles y permisos).
