@@ -13,6 +13,7 @@ export class RoleValidation {
   }
 
   async validateUpdate(id: number, dto: UpdateRoleRequestDto): Promise<void> {
+    await this.ensureRoleExists(id);
     await this.ensureRoleIsNotAdmin(id);
     await this.ensureRoleNameNotTaken(dto.name, id);
   }

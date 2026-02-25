@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class RoleResponseDto {
   @ApiProperty({ example: 1, description: "Role id" })
-  id: string;
+  id: number;
 
   @ApiProperty({ example: "EDITOR", description: "Role name" })
   name: string;

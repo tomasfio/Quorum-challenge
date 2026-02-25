@@ -12,6 +12,7 @@ export class PermissionValidation {
   }
 
   async validateUpdate(id: number, dto: UpdatePermissionRequestDto): Promise<void> {
+    await this.ensurePermissionExists(id);
     await this.ensurePermissionNameNotTaken(dto.name, id);
   }
 

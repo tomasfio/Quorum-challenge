@@ -15,7 +15,7 @@ export class RoleService {
   async getRoles(): Promise<RoleResponseDto[]> {
     const roles = await this.roleRepository.getRoles();
     return roles.map((role) => new RoleResponseDto({
-      id: role.id.toString(),
+      id: role.id,
       name: role.name,
     }));
   }
@@ -26,7 +26,7 @@ export class RoleService {
       throw new NotFoundException('Role not found');
     }
     return new RoleResponseDto({
-      id: role.id.toString(),
+      id: role.id,
       name: role.name,
       permissions: role.permissions.map((permission) => permission.name),
     });

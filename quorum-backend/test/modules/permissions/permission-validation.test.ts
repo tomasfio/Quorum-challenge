@@ -31,6 +31,7 @@ describe('PermissionValidation', () => {
   });
 
   it('[validateUpdate] should fail if new name is already taken by another permission', async () => {
+    repo.findById.mockResolvedValue({ id: 1, name: 'read' } as any);
     repo.findByName.mockResolvedValue({ id: 2, name: 'delete' } as any);
 
     await expect(
@@ -39,6 +40,7 @@ describe('PermissionValidation', () => {
   });
 
   it('[validateUpdate] should pass if same permission keeps its name', async () => {
+    repo.findById.mockResolvedValue({ id: 1, name: 'read' } as any);
     repo.findByName.mockResolvedValue({ id: 1, name: 'read' } as any);
 
     await expect(
@@ -47,6 +49,7 @@ describe('PermissionValidation', () => {
   });
 
   it('[validateUpdate] should pass if name is not taken', async () => {
+    repo.findById.mockResolvedValue({ id: 1, name: 'read' } as any);
     repo.findByName.mockResolvedValue(null);
 
     await expect(

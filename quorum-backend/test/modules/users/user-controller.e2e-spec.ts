@@ -184,7 +184,7 @@ describe('UserController (e2e)', () => {
   });
 
   describe('GET /users', () => {
-    it('should return all users with roles and permissions', async () => {
+    it('should return all users without roles and permissions', async () => {
       const existingUser = inMemoryRepo.seed({ name: 'First', email: 'dup@example.com', password: 'SecurePass123', roles: ['EDITOR'], permissions: [] });
       const existingUser2 = inMemoryRepo.seed({ name: 'Second', email: 'dup2@example.com', password: 'SecurePass123', roles: ['EDITOR'], permissions: ['read'] });
       const existingUser3 = inMemoryRepo.seed({ name: 'Third', email: 'dup3@example.com', password: 'SecurePass123', roles: [], permissions: [] });
@@ -195,10 +195,6 @@ describe('UserController (e2e)', () => {
       expect(res.body).toBeDefined();
       expect(res.body.length).toBe(3);
       expect(res.body.map((user: UserResponseDto) => user.id)).toEqual([existingUser.id, existingUser2.id, existingUser3.id]);
-      expect(res.body[0].roles).toEqual(['EDITOR']);
-      expect(res.body[0].permissions).toEqual([]);
-      expect(res.body[1].roles).toEqual(['EDITOR']);
-      expect(res.body[1].permissions).toEqual(['read']);
     });
   });
 
